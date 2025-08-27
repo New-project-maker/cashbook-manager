@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>💰 Cashbook Manager </title>
+  <title>💰 Cashbook Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; padding: 20px; }
-    h1 { color: cyan; }
-    input, button, select { padding: 5px; margin: 5px; border-radius: 5px; border: none; }
+    body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; padding: 15px; margin: 0; }
+    h1 { color: cyan; font-size: 24px; margin-bottom: 10px; }
+    input, button, select { padding: 8px; margin: 5px; border-radius: 5px; border: none; font-size: 14px; }
     button { font-weight: bold; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { padding: 8px; text-align: center; border: 1px solid gray; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+    th, td { padding: 10px; text-align: center; border: 1px solid gray; word-break: break-word; }
     th { background-color: #333; }
-    .summary { display: flex; justify-content: space-around; margin-top: 15px; gap: 15px; }
-    .summary-card { flex: 1; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: transform 0.3s, box-shadow 0.3s; }
+    .summary { display: flex; flex-wrap: wrap; justify-content: space-around; margin-top: 15px; gap: 15px; }
+    .summary-card { flex: 1; min-width: 100px; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: transform 0.3s, box-shadow 0.3s; }
     .summary-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0, 255, 255, 0.6); }
     .received { background: linear-gradient(135deg, #00c6ff, #0072ff); }
     .expense  { background: linear-gradient(135deg, #ff512f, #dd2476); }
@@ -21,13 +22,29 @@
     .card { background: #3a3a55; margin: 10px; padding: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); transition: transform 0.3s, box-shadow 0.3s; }
     .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(255,255,255,0.2); }
     .card h3 { margin: 0; color: cyan; font-size: 16px; }
-    .card p { margin: 5px 0; font-size: 16px; }
+    .card p { margin: 5px 0; font-size: 14px; }
     .received, .expense, .balance { font-weight: bold; }
-   </style>
-  </head>
- <body>
 
-  <h1>💰 Cashbook Manager </h1>
+    /* Mobile responsive */
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead tr { display: none; }
+      tr { margin-bottom: 12px; border: 1px solid #555; border-radius: 8px; padding: 8px; background: #2b2b40; }
+      td { border: none; text-align: left; padding: 6px; }
+      td:before { font-weight: bold; display: block; color: cyan; }
+      td:nth-of-type(1):before { content: "Date & Time"; }
+      td:nth-of-type(2):before { content: "Received"; }
+      td:nth-of-type(3):before { content: "Name"; }
+      td:nth-of-type(4):before { content: "Note"; }
+      td:nth-of-type(5):before { content: "Expense"; }
+      td:nth-of-type(6):before { content: "Closing"; }
+      td:nth-of-type(7):before { content: "Actions"; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>💰 Cashbook Manager</h1>
 
   <div>
     <label>Received:</label>
