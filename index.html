@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>💰 Cashbook Manager</title>
+  <title>💰 Cashbook Manager </title>
   <style>
     body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; padding: 20px; }
     h1 { color: cyan; }
-    input, button, select { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
+    input, button, select { padding: 5px; margin: 5px; border-radius: 5px; border: none; }
     button { font-weight: bold; cursor: pointer; }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     th, td { padding: 8px; text-align: center; border: 1px solid gray; }
@@ -23,50 +23,21 @@
     .card h3 { margin: 0; color: cyan; font-size: 16px; }
     .card p { margin: 5px 0; font-size: 16px; }
     .received, .expense, .balance { font-weight: bold; }
+   </style>
+  </head>
+ <body>
 
-    /* ✅ Mobile Responsive */
-    @media (max-width: 768px) {
-      input, button, select {
-        width: 100%;
-        max-width: 100%;
-      }
-      .summary {
-        flex-direction: column;
-      }
-      .summary-card {
-        margin-bottom: 10px;
-      }
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
-      thead { display: none; }
-      tr { margin-bottom: 15px; background: #2b2b40; border-radius: 10px; padding: 10px; }
-      td {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px;
-        border: none;
-        border-bottom: 1px solid #444;
-      }
-      td:last-child { border-bottom: none; }
-      td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        color: cyan;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <h1>💰 Cashbook Manager</h1>
+  <h1>💰 Cashbook Manager </h1>
 
   <div>
-    <input type="number" id="received" placeholder="Received Amount">
-    <input type="text" id="name" placeholder="Name">
-    <input type="text" id="note" placeholder="Note">
-    <input type="number" id="expense" placeholder="Expense Amount">
+    <label>Received:</label>
+    <input type="number" id="received" placeholder="প্রাপ্ত টাকা">
+    <label>Name:</label>
+    <input type="text" id="name" placeholder="কাকে দিলেন">
+    <label>Note:</label>
+    <input type="text" id="note" placeholder="নোট লিখুন">
+    <label>Expense:</label>
+    <input type="number" id="expense" placeholder="খরচের পরিমাণ">
     <button id="addBtn" style="background:#00bfff; color:black;">Add Entry</button>
     <button id="clearBtn" style="background:red; color:white;">Clear All</button>
   </div>
@@ -129,13 +100,9 @@
         lastDate = dt;
       }
       table.innerHTML += `<tr>
-        <td data-label="Date & Time">${e.date}</td>
-        <td data-label="Received">${e.received}</td>
-        <td data-label="Name">${e.name}</td>
-        <td data-label="Note">${e.note}</td>
-        <td data-label="Expense">${e.expense}</td>
-        <td data-label="Closing">${e.closing}</td>
-        <td data-label="Actions"><button onclick="editEntry(${idx})">✏️</button> <button onclick="deleteEntry(${idx})">🗑</button></td>
+        <td>${e.date}</td><td>${e.received}</td><td>${e.name}</td><td>${e.note}</td>
+        <td>${e.expense}</td><td>${e.closing}</td>
+        <td><button onclick="editEntry(${idx})">✏️</button> <button onclick="deleteEntry(${idx})">🗑</button></td>
       </tr>`;
     });
 
