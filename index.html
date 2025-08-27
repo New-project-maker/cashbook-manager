@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>💰 Cashbook Manager (Cloud-Enabled)</title>
+  <title>💰 Cashbook Manager </title>
   <style>
     body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; padding: 20px; }
     h1 { color: cyan; }
@@ -23,17 +23,21 @@
     .card h3 { margin: 0; color: cyan; font-size: 16px; }
     .card p { margin: 5px 0; font-size: 16px; }
     .received, .expense, .balance { font-weight: bold; }
-  </style>
-</head>
-<body>
+   </style>
+  </head>
+ <body>
 
-  <h1>💰 Cashbook Manager (Cloud-Enabled)</h1>
+  <h1>💰 Cashbook Manager </h1>
 
   <div>
-    <input type="number" id="received" placeholder="Received Amount">
-    <input type="text" id="name" placeholder="Name">
-    <input type="text" id="note" placeholder="Note">
-    <input type="number" id="expense" placeholder="Expense Amount">
+    <label>Received:</label>
+    <input type="number" id="received" placeholder="প্রাপ্ত টাকা">
+    <label>Name:</label>
+    <input type="text" id="name" placeholder="কাকে দিলেন">
+    <label>Note:</label>
+    <input type="text" id="note" placeholder="নোট লিখুন">
+    <label>Expense:</label>
+    <input type="number" id="expense" placeholder="খরচের পরিমাণ">
     <button id="addBtn" style="background:#00bfff; color:black;">Add Entry</button>
     <button id="clearBtn" style="background:red; color:white;">Clear All</button>
   </div>
