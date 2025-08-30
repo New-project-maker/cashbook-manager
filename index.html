@@ -6,7 +6,7 @@
   <title>💰 Cashbook Manager</title>
   <style>
     body {
-      background: #1e1e2e;
+      background-color: #1e1e2f;
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
@@ -15,50 +15,61 @@
       color: cyan;
     }
     table {
-      width: 100%;
+      width: 95%;
+      margin: 20px auto;
       border-collapse: collapse;
-      margin-top: 20px;
+      background: #2b2b3c;
+      color: white;
     }
-    th, td {
+    table, th, td {
       border: 1px solid #444;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
     }
     th {
       background: #333;
     }
     .btn {
-      padding: 10px 20px;
-      margin: 5px;
+      padding: 10px 15px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
-    }
-    .btn-blue { background: #3498db; color: white; }
-    .btn-red { background: #e74c3c; color: white; }
-    .btn-green { background: #27ae60; color: white; }
-    input {
       margin: 5px;
-      padding: 8px;
     }
+    .btn-add { background: #2196F3; color: white; }
+    .btn-clear { background: #f44336; color: white; }
+    .stat {
+      display: inline-block;
+      margin: 10px;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .received { background: #1976d2; }
+    .expense { background: #d32f2f; }
+    .balance { background: #388e3c; }
   </style>
 </head>
 <body>
+
   <h1>💰 Cashbook Manager</h1>
 
-  <input id="receive" type="number" placeholder="Receive">
-  <input id="name" type="text" placeholder="Name">
-  <input id="note" type="text" placeholder="Note">
-  <input id="expense" type="number" placeholder="Expense">
-  <button class="btn btn-blue" onclick="addEntry()">Add Entry</button>
-  <button class="btn btn-red" onclick="clearAll()">Clear All</button>
+  <div>
+    <input type="number" id="receive" placeholder="Receive">
+    <input type="text" id="name" placeholder="Name">
+    <input type="text" id="note" placeholder="Note">
+    <input type="number" id="expense" placeholder="Expense">
+    <button class="btn btn-add" onclick="addEntry()">Add Entry</button>
+    <button class="btn btn-clear" onclick="clearAll()">Clear All</button>
+  </div>
 
-  <h2>
-    <span id="totalReceive">Total Received: 0</span> |
-    <span id="totalExpense">Total Expense: 0</span> |
-    <span id="instantBalance">Instant Balance: 0</span>
-  </h2>
+  <div>
+    <span class="stat received">Total Received: <span id="totalReceived">0</span></span>
+    <span class="stat expense">Total Expense: <span id="totalExpense">0</span></span>
+    <span class="stat balance">Instant Balance: <span id="instantBalance">0</span></span>
+  </div>
 
   <table>
     <thead>
@@ -71,66 +82,67 @@
         <th>Closing</th>
       </tr>
     </thead>
-    <tbody id="tableBody"></tbody>
+    <tbody id="data"></tbody>
   </table>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw5kcA5u2rmizMSX-nnM-2Q9v3WTnotDfY2U9LB_kL1RJ7-KpusvVbf7OLptD6iuyhQ/exec";
+    const scriptURL = "YOUR_GOOGLE_SCRIPT_WEBAPP_URL"; // এখানে আপনার Apps Script Web App URL বসান
 
-    async function loadData() {
-      const res = await fetch(API_URL);
+    async function fetchData() {
+      const res = await fetch(scriptURL);
       const data = await res.json();
+      renderTable(data);
+    }
 
-      let totalReceive = 0;
-      let totalExpense = 0;
+    function renderTable(data) {
       let tbody = "";
+      let totalReceived = 0, totalExpense = 0, balance = 0;
 
       data.forEach(entry => {
-        totalReceive += Number(entry.receive) || 0;
-        totalExpense += Number(entry.expense) || 0;
+        totalReceived += Number(entry.Receive) || 0;
+        totalExpense += Number(entry.Expense) || 0;
+        balance = Number(entry.Closing) || balance;
 
         tbody += `
           <tr>
-            <td>${entry.date}</td>
-            <td>${entry.receive}</td>
-            <td>${entry.name}</td>
-            <td>${entry.note}</td>
-            <td>${entry.expense}</td>
-            <td>${entry.closing}</td>
+            <td>${entry.Date}</td>
+            <td>${entry.Receive}</td>
+            <td>${entry.Name}</td>
+            <td>${entry.Note}</td>
+            <td>${entry.Expense}</td>
+            <td>${entry.Closing}</td>
           </tr>
         `;
       });
 
-      document.getElementById("tableBody").innerHTML = tbody;
-      document.getElementById("totalReceive").innerText = "Total Received: " + totalReceive;
-      document.getElementById("totalExpense").innerText = "Total Expense: " + totalExpense;
-      document.getElementById("instantBalance").innerText = "Instant Balance: " + (totalReceive - totalExpense);
+      document.getElementById("data").innerHTML = tbody;
+      document.getElementById("totalReceived").innerText = totalReceived;
+      document.getElementById("totalExpense").innerText = totalExpense;
+      document.getElementById("instantBalance").innerText = balance;
     }
 
     async function addEntry() {
-      const receive = document.getElementById("receive").value;
-      const name = document.getElementById("name").value;
-      const note = document.getElementById("note").value;
-      const expense = document.getElementById("expense").value;
+      const newEntry = {
+        Receive: document.getElementById("receive").value,
+        Name: document.getElementById("name").value,
+        Note: document.getElementById("note").value,
+        Expense: document.getElementById("expense").value,
+      };
 
-      const closing = receive - expense;
-      const date = new Date().toLocaleString();
-
-      const entry = { date, receive, name, note, expense, closing };
-
-      await fetch(API_URL, {
+      await fetch(scriptURL, {
         method: "POST",
-        body: JSON.stringify(entry)
+        body: JSON.stringify(newEntry)
       });
 
-      loadData();
+      fetchData();
     }
 
     async function clearAll() {
-      alert("Clear All option implement করতে হলে Apps Script-এ আলাদা ফাংশন লিখতে হবে!");
+      await fetch(scriptURL + "?clear=true");
+      fetchData();
     }
 
-    loadData();
+    fetchData();
   </script>
 </body>
 </html>
