@@ -79,7 +79,7 @@
   <div id="monthlySummary" class="summaryBox"></div>
 
 <script>
-  const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzs6hL2K5AAoOZ0rQf8RZ7mU8ouqE0pUB18QKMcPoRYhADYQ16Me9KXMraLm5fbVZCS/exec";
+  const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5kcA5u2rmizMSX-nnM-2Q9v3WTnotDfY2U9LB_kL1RJ7-KpusvVbf7OLptD6iuyhQ/exec";
   const MASTER_PASSWORD = "1234";
   let cashbook = [], totalReceived = 0, totalExpense = 0, closingBalance = 0;
 
@@ -102,6 +102,32 @@
       totalExpense = p.totalExpense || 0;
       closingBalance = p.closingBalance || 0;
       renderTable();
+    }
+  }
+
+  // 🔹 Cloud থেকে ডেটা লোড
+  async function loadFromCloud() {
+    try {
+      const res = await fetch(GOOGLE_WEB_APP_URL);
+      const data = await res.json();
+
+      if (Array.isArray(data)) {
+        cashbook = data.map(e => ({
+          date: e.date,
+          received: Number(e.received) || 0,
+          name: e.name,
+          note: e.note,
+          expense: Number(e.expense) || 0,
+          closing: Number(e.closing) || 0
+        }));
+        totalReceived = cashbook.reduce((sum, e) => sum + e.received, 0);
+        totalExpense  = cashbook.reduce((sum, e) => sum + e.expense, 0);
+        closingBalance = totalReceived - totalExpense;
+        renderTable();
+        saveLocal();
+      }
+    } catch (err) {
+      console.error("Cloud Load Error:", err);
     }
   }
 
@@ -147,7 +173,7 @@
     cashbook.unshift(entry);
     saveLocal(); renderTable();
 
-    // Cloud sync
+    // 🔹 Cloud এ সেভ
     fetch(GOOGLE_WEB_APP_URL, { method: "POST", body: JSON.stringify(entry) })
       .then(r => r.text()).then(msg => console.log("Saved Cloud:", msg))
       .catch(err => console.error("Cloud Error:", err));
@@ -225,9 +251,7 @@
 
   // Initialize
   loadLocal();
+  loadFromCloud();  // 🔹 Cloud থেকে লোড
 </script>
 </body>
 </html>
-
-
-
