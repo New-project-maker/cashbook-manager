@@ -2,123 +2,135 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>💰 Cashbook Manager</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; }
-    h1 { color: #00ffff; margin: 20px; }
-    input { padding: 6px; margin: 5px; border-radius: 5px; border: none; }
-    button { padding: 8px 14px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .add-btn { background: #00bfff; color: white; }
-    .clear-btn { background: #ff3333; color: white; }
-    .card { display: inline-block; padding: 20px; margin: 10px; border-radius: 15px; font-size: 20px; font-weight: bold; min-width: 180px; }
-    .blue { background: #2196f3; }
-    .red { background: #f44336; }
-    .green { background: #4caf50; }
-    table { width: 95%; margin: 20px auto; border-collapse: collapse; background: #2e2e3e; }
-    th, td { padding: 10px; border: 1px solid #444; }
-    th { background: #444; }
-    .actions button { margin: 0 3px; padding: 4px 8px; font-size: 14px; }
+    body {
+      background: #1e1e2e;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    h1 {
+      color: cyan;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #333;
+    }
+    .btn {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-blue { background: #3498db; color: white; }
+    .btn-red { background: #e74c3c; color: white; }
+    .btn-green { background: #27ae60; color: white; }
+    input {
+      margin: 5px;
+      padding: 8px;
+    }
   </style>
 </head>
 <body>
   <h1>💰 Cashbook Manager</h1>
 
-  <div>
-    <input type="number" id="received" placeholder="Received">
-    <input type="text" id="name" placeholder="Name">
-    <input type="text" id="note" placeholder="Note">
-    <input type="number" id="expense" placeholder="Expense">
-    <button class="add-btn" onclick="addEntry()">Add Entry</button>
-    <button class="clear-btn" onclick="clearAll()">Clear All</button>
-  </div>
+  <input id="receive" type="number" placeholder="Receive">
+  <input id="name" type="text" placeholder="Name">
+  <input id="note" type="text" placeholder="Note">
+  <input id="expense" type="number" placeholder="Expense">
+  <button class="btn btn-blue" onclick="addEntry()">Add Entry</button>
+  <button class="btn btn-red" onclick="clearAll()">Clear All</button>
 
-  <div>
-    <div class="card blue">Total Received: <span id="totalReceived">0</span></div>
-    <div class="card red">Total Expense: <span id="totalExpense">0</span></div>
-    <div class="card green">Instant Balance: <span id="instantBalance">0</span></div>
-  </div>
+  <h2>
+    <span id="totalReceive">Total Received: 0</span> |
+    <span id="totalExpense">Total Expense: 0</span> |
+    <span id="instantBalance">Instant Balance: 0</span>
+  </h2>
 
-  <table id="entryTable">
+  <table>
     <thead>
       <tr>
         <th>Date & Time</th>
-        <th>Received</th>
+        <th>Receive</th>
         <th>Name</th>
         <th>Note</th>
         <th>Expense</th>
         <th>Closing</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="tableBody"></tbody>
   </table>
 
-<script>
-const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5kcA5u2rmizMSX-nnM-2Q9v3WTnotDfY2U9LB_kL1RJ7-KpusvVbf7OLptD6iuyhQ/exec";
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw5kcA5u2rmizMSX-nnM-2Q9v3WTnotDfY2U9LB_kL1RJ7-KpusvVbf7OLptD6iuyhQ/exec";
 
-// ✅ নতুন এন্ট্রি Google Sheet এ পাঠানো
-async function addEntry() {
-  const received = document.getElementById("received").value || 0;
-  const name = document.getElementById("name").value;
-  const note = document.getElementById("note").value;
-  const expense = document.getElementById("expense").value || 0;
-  const date = new Date().toLocaleString("en-GB"); // DD/MM/YYYY HH:MM
-  const closing = Number(received) - Number(expense);
+    async function loadData() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
 
-  const entry = { date, received, name, note, expense, closing };
+      let totalReceive = 0;
+      let totalExpense = 0;
+      let tbody = "";
 
-  try {
-    await fetch(GOOGLE_WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify(entry)
-    });
-    loadEntries(); // ✅ আবার রিফ্রেশ করে ডেটা দেখাও
-  } catch (err) {
-    console.error("Add error:", err);
-  }
-}
+      data.forEach(entry => {
+        totalReceive += Number(entry.receive) || 0;
+        totalExpense += Number(entry.expense) || 0;
 
-// ✅ সব এন্ট্রি Google Sheet থেকে লোড করা
-async function loadEntries() {
-  try {
-    const res = await fetch(GOOGLE_WEB_APP_URL);
-    const data = await res.json();
+        tbody += `
+          <tr>
+            <td>${entry.date}</td>
+            <td>${entry.receive}</td>
+            <td>${entry.name}</td>
+            <td>${entry.note}</td>
+            <td>${entry.expense}</td>
+            <td>${entry.closing}</td>
+          </tr>
+        `;
+      });
 
-    const tbody = document.querySelector("#entryTable tbody");
-    tbody.innerHTML = "";
+      document.getElementById("tableBody").innerHTML = tbody;
+      document.getElementById("totalReceive").innerText = "Total Received: " + totalReceive;
+      document.getElementById("totalExpense").innerText = "Total Expense: " + totalExpense;
+      document.getElementById("instantBalance").innerText = "Instant Balance: " + (totalReceive - totalExpense);
+    }
 
-    let totalReceived = 0, totalExpense = 0;
+    async function addEntry() {
+      const receive = document.getElementById("receive").value;
+      const name = document.getElementById("name").value;
+      const note = document.getElementById("note").value;
+      const expense = document.getElementById("expense").value;
 
-    data.forEach(entry => {
-      const row = tbody.insertRow();
-      row.insertCell().innerText = entry.date;
-      row.insertCell().innerText = entry.received;
-      row.insertCell().innerText = entry.name;
-      row.insertCell().innerText = entry.note;
-      row.insertCell().innerText = entry.expense;
-      row.insertCell().innerText = entry.closing;
+      const closing = receive - expense;
+      const date = new Date().toLocaleString();
 
-      totalReceived += Number(entry.received) || 0;
-      totalExpense += Number(entry.expense) || 0;
-    });
+      const entry = { date, receive, name, note, expense, closing };
 
-    document.getElementById("totalReceived").innerText = totalReceived;
-    document.getElementById("totalExpense").innerText = totalExpense;
-    document.getElementById("instantBalance").innerText = totalReceived - totalExpense;
+      await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(entry)
+      });
 
-  } catch (err) {
-    console.error("Load error:", err);
-  }
-}
+      loadData();
+    }
 
-// ✅ Clear All (শুধু টেবিল থেকে মুছে ফেলে, Sheet থেকে না)
-function clearAll() {
-  document.querySelector("#entryTable tbody").innerHTML = "";
-  document.getElementById("totalReceived").innerText = 0;
-  document.getElementById("totalExpense").innerText = 0;
-  document.getElementById("instantBalance").innerText = 0;
-}
+    async function clearAll() {
+      alert("Clear All option implement করতে হলে Apps Script-এ আলাদা ফাংশন লিখতে হবে!");
+    }
 
-window.onload = loadEntries;
-</script>
+    loadData();
+  </script>
 </body>
 </html>
