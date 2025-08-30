@@ -3,255 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <title>💰 Cashbook Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; padding: 15px; margin: 0; }
-    h1 { color: cyan; font-size: 24px; margin-bottom: 10px; }
-    input, button, select { padding: 8px; margin: 5px; border-radius: 5px; border: none; font-size: 14px; }
-    button { font-weight: bold; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-    th, td { padding: 4px 6px; text-align: center; border: 1px solid gray; word-break: break-word; line-height: 1.2; font-size: 12px; }
-    th { background-color: #333; }
-    .summary { display: flex; flex-wrap: wrap; justify-content: space-around; margin-top: 15px; gap: 15px; }
-    .summary-card { flex: 1; min-width: 100px; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: transform 0.3s, box-shadow 0.3s; }
-    .summary-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0, 255, 255, 0.6); }
-    .received { background: linear-gradient(135deg, #00c6ff, #0072ff); }
-    .expense  { background: linear-gradient(135deg, #ff512f, #dd2476); }
-    .balance  { background: linear-gradient(135deg, #56ab2f, #a8e063); }
-    .summaryBox { display: none; margin-top: 15px; padding: 10px; border-radius: 10px; background: #2b2b40; text-align: left; }
-    .card { background: #3a3a55; margin: 10px; padding: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); transition: transform 0.3s, box-shadow 0.3s; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(255,255,255,0.2); }
-    .card h3 { margin: 0; color: cyan; font-size: 16px; }
-    .card p { margin: 5px 0; font-size: 14px; }
-    .received, .expense, .balance { font-weight: bold; }
-
-    /* Mobile responsive */
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      thead tr { display: none; }
-      tr { margin-bottom: 12px; border: 1px solid #555; border-radius: 8px; padding: 8px; background: #2b2b40; }
-      td { border: none; text-align: left; padding: 6px; }
-      td:before { font-weight: bold; display: block; color: cyan; }
-      td:nth-of-type(1):before { content: "Date & Time"; }
-      td:nth-of-type(2):before { content: "Received"; }
-      td:nth-of-type(3):before { content: "Name"; }
-      td:nth-of-type(4):before { content: "Note"; }
-      td:nth-of-type(5):before { content: "Expense"; }
-      td:nth-of-type(6):before { content: "Closing"; }
-      td:nth-of-type(7):before { content: "Actions"; }
-    }
+    body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; }
+    h1 { color: #00ffff; margin: 20px; }
+    input { padding: 6px; margin: 5px; border-radius: 5px; border: none; }
+    button { padding: 8px 14px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .add-btn { background: #00bfff; color: white; }
+    .clear-btn { background: #ff3333; color: white; }
+    .card { display: inline-block; padding: 20px; margin: 10px; border-radius: 15px; font-size: 20px; font-weight: bold; min-width: 180px; }
+    .blue { background: #2196f3; }
+    .red { background: #f44336; }
+    .green { background: #4caf50; }
+    table { width: 95%; margin: 20px auto; border-collapse: collapse; background: #2e2e3e; }
+    th, td { padding: 10px; border: 1px solid #444; }
+    th { background: #444; }
+    .actions button { margin: 0 3px; padding: 4px 8px; font-size: 14px; }
   </style>
 </head>
 <body>
-
   <h1>💰 Cashbook Manager</h1>
 
   <div>
-    <label>Received:</label>
-    <input type="number" id="received" placeholder="প্রাপ্ত টাকা">
-    <label>Name:</label>
-    <input type="text" id="name" placeholder="কাকে দিলেন">
-    <label>Note:</label>
-    <input type="text" id="note" placeholder="নোট লিখুন">
-    <label>Expense:</label>
-    <input type="number" id="expense" placeholder="খরচের পরিমাণ">
-    <button id="addBtn" style="background:#00bfff; color:black;">Add Entry</button>
-    <button id="clearBtn" style="background:red; color:white;">Clear All</button>
+    <input type="number" id="received" placeholder="Received">
+    <input type="text" id="name" placeholder="Name">
+    <input type="text" id="note" placeholder="Note">
+    <input type="number" id="expense" placeholder="Expense">
+    <button class="add-btn" onclick="addEntry()">Add Entry</button>
+    <button class="clear-btn" onclick="clearAll()">Clear All</button>
   </div>
 
-  <div class="summary">
-    <div class="summary-card received"><h3>Total Received</h3><p id="totalReceived">0</p></div>
-    <div class="summary-card expense"><h3>Total Expense</h3><p id="totalExpense">0</p></div>
-    <div class="summary-card balance"><h3>Instant Balance</h3><p id="closingBalance">0</p></div>
+  <div>
+    <div class="card blue">Total Received: <span id="totalReceived">0</span></div>
+    <div class="card red">Total Expense: <span id="totalExpense">0</span></div>
+    <div class="card green">Instant Balance: <span id="instantBalance">0</span></div>
   </div>
 
-  <table>
+  <table id="entryTable">
     <thead>
-      <tr><th>Date & Time</th><th>Received</th><th>Name</th><th>Note</th><th>Expense</th><th>Closing</th><th>Actions</th></tr>
+      <tr>
+        <th>Date & Time</th>
+        <th>Received</th>
+        <th>Name</th>
+        <th>Note</th>
+        <th>Expense</th>
+        <th>Closing</th>
+      </tr>
     </thead>
-    <tbody id="cashbookTable"></tbody>
+    <tbody></tbody>
   </table>
 
-  <button id="dailyBtn" style="background:#28a745; color:white;">Toggle Daily Summary</button>
-  <button id="monthlyBtn" style="background:#28a745; color:white;">Toggle Monthly Summary</button>
-
-  <div id="dailySummary" class="summaryBox"></div>
-  <div id="monthlySummary" class="summaryBox"></div>
-
 <script>
-  const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5kcA5u2rmizMSX-nnM-2Q9v3WTnotDfY2U9LB_kL1RJ7-KpusvVbf7OLptD6iuyhQ/exec";
-  const MASTER_PASSWORD = "1234";
-  let cashbook = [], totalReceived = 0, totalExpense = 0, closingBalance = 0;
+const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5kcA5u2rmizMSX-nnM-2Q9v3WTnotDfY2U9LB_kL1RJ7-KpusvVbf7OLptD6iuyhQ/exec";
 
-  function getTodayDateTime() {
-    const now = new Date();
-    return now.toLocaleDateString("en-GB") + " " +
-           now.toLocaleTimeString("en-US", {hour:"2-digit", minute:"2-digit"});
+// ✅ নতুন এন্ট্রি Google Sheet এ পাঠানো
+async function addEntry() {
+  const received = document.getElementById("received").value || 0;
+  const name = document.getElementById("name").value;
+  const note = document.getElementById("note").value;
+  const expense = document.getElementById("expense").value || 0;
+  const date = new Date().toLocaleString("en-GB"); // DD/MM/YYYY HH:MM
+  const closing = Number(received) - Number(expense);
+
+  const entry = { date, received, name, note, expense, closing };
+
+  try {
+    await fetch(GOOGLE_WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify(entry)
+    });
+    loadEntries(); // ✅ আবার রিফ্রেশ করে ডেটা দেখাও
+  } catch (err) {
+    console.error("Add error:", err);
   }
+}
 
-  function saveLocal() {
-    localStorage.setItem("cashbook_app_data", JSON.stringify({cashbook, totalReceived, totalExpense, closingBalance}));
-  }
+// ✅ সব এন্ট্রি Google Sheet থেকে লোড করা
+async function loadEntries() {
+  try {
+    const res = await fetch(GOOGLE_WEB_APP_URL);
+    const data = await res.json();
 
-  function loadLocal() {
-    const saved = localStorage.getItem("cashbook_app_data");
-    if (saved) {
-      const p = JSON.parse(saved);
-      cashbook = p.cashbook || [];
-      totalReceived = p.totalReceived || 0;
-      totalExpense = p.totalExpense || 0;
-      closingBalance = p.closingBalance || 0;
-      renderTable();
-    }
-  }
+    const tbody = document.querySelector("#entryTable tbody");
+    tbody.innerHTML = "";
 
-  // 🔹 Cloud থেকে ডেটা লোড
-  async function loadFromCloud() {
-    try {
-      const res = await fetch(GOOGLE_WEB_APP_URL);
-      const data = await res.json();
+    let totalReceived = 0, totalExpense = 0;
 
-      if (Array.isArray(data)) {
-        cashbook = data.map(e => ({
-          date: e.date,
-          received: Number(e.received) || 0,
-          name: e.name,
-          note: e.note,
-          expense: Number(e.expense) || 0,
-          closing: Number(e.closing) || 0
-        }));
-        totalReceived = cashbook.reduce((sum, e) => sum + e.received, 0);
-        totalExpense  = cashbook.reduce((sum, e) => sum + e.expense, 0);
-        closingBalance = totalReceived - totalExpense;
-        renderTable();
-        saveLocal();
-      }
-    } catch (err) {
-      console.error("Cloud Load Error:", err);
-    }
-  }
+    data.forEach(entry => {
+      const row = tbody.insertRow();
+      row.insertCell().innerText = entry.date;
+      row.insertCell().innerText = entry.received;
+      row.insertCell().innerText = entry.name;
+      row.insertCell().innerText = entry.note;
+      row.insertCell().innerText = entry.expense;
+      row.insertCell().innerText = entry.closing;
 
-  function renderTable() {
-    const table = document.getElementById("cashbookTable");
-    table.innerHTML = "";
-    let lastDate = "";
-
-    cashbook.forEach((e, idx) => {
-      const dt = e.date.split(" ")[0];
-      if (dt !== lastDate) {
-        table.innerHTML += `<tr style="background:#444;color:yellow;font-weight:bold;"><td colspan="7">📅 ${dt}</td></tr>`;
-        lastDate = dt;
-      }
-      table.innerHTML += `<tr>
-        <td>${e.date}</td><td>${e.received}</td><td>${e.name}</td><td>${e.note}</td>
-        <td>${e.expense}</td><td>${e.closing}</td>
-        <td><button onclick="editEntry(${idx})">✏️</button> <button onclick="deleteEntry(${idx})">🗑</button></td>
-      </tr>`;
+      totalReceived += Number(entry.received) || 0;
+      totalExpense += Number(entry.expense) || 0;
     });
 
     document.getElementById("totalReceived").innerText = totalReceived;
     document.getElementById("totalExpense").innerText = totalExpense;
-    document.getElementById("closingBalance").innerText = closingBalance;
+    document.getElementById("instantBalance").innerText = totalReceived - totalExpense;
 
-    renderDaily();
-    renderMonthly();
+  } catch (err) {
+    console.error("Load error:", err);
   }
+}
 
-  document.getElementById("addBtn").onclick = () => {
-    const received = parseFloat(document.getElementById("received").value) || 0;
-    const expense  = parseFloat(document.getElementById("expense").value) || 0;
-    const name     = document.getElementById("name").value || "-";
-    const note     = document.getElementById("note").value || "-";
+// ✅ Clear All (শুধু টেবিল থেকে মুছে ফেলে, Sheet থেকে না)
+function clearAll() {
+  document.querySelector("#entryTable tbody").innerHTML = "";
+  document.getElementById("totalReceived").innerText = 0;
+  document.getElementById("totalExpense").innerText = 0;
+  document.getElementById("instantBalance").innerText = 0;
+}
 
-    totalReceived += received;
-    totalExpense += expense;
-    closingBalance += (received - expense);
-
-    const entry = {
-      date: getTodayDateTime(), received, name, note, expense, closing: closingBalance
-    };
-    cashbook.unshift(entry);
-    saveLocal(); renderTable();
-
-    // 🔹 Cloud এ সেভ
-    fetch(GOOGLE_WEB_APP_URL, { method: "POST", body: JSON.stringify(entry) })
-      .then(r => r.text()).then(msg => console.log("Saved Cloud:", msg))
-      .catch(err => console.error("Cloud Error:", err));
-
-    ["received","expense","name","note"].forEach(id => document.getElementById(id).value = "");
-  };
-
-  document.getElementById("clearBtn").onclick = () => {
-    if (prompt("Password?") !== MASTER_PASSWORD) return alert("Wrong!");
-    cashbook = []; totalReceived = totalExpense = closingBalance = 0;
-    saveLocal(); renderTable();
-  };
-
-  function deleteEntry(idx) {
-    if (prompt("Password?") !== MASTER_PASSWORD) return alert("Wrong!");
-    const e = cashbook.splice(idx, 1)[0];
-    totalReceived -= e.received;
-    totalExpense  -= e.expense;
-    closingBalance = cashbook.reduce((sum, en) => sum + (en.received - en.expense), 0);
-    cashbook.forEach((en, i) => en.closing = (i===0 ? en.received-en.expense : cashbook[i-1].closing + en.received - en.expense));
-    saveLocal(); renderTable();
-  }
-
-  function editEntry(idx) {
-    const e = cashbook[idx];
-    ["received", "expense", "name", "note"].forEach(id => document.getElementById(id).value = e[id]);
-    deleteEntry(idx);
-  }
-
-  function renderDaily() {
-    const daily = {};
-    cashbook.forEach(e => {
-      const d = e.date.split(" ")[0];
-      daily[d] = daily[d] || { received: 0, expense: 0 };
-      daily[d].received += e.received;
-      daily[d].expense  += e.expense;
-    });
-    const dv = document.getElementById("dailySummary");
-    dv.innerHTML = "<h3>Daily Summary</h3>";
-    Object.entries(daily).forEach(([d, {received, expense}]) => {
-      dv.innerHTML += `<div class="card"><h3>${d}</h3>
-        <p class="received">Received: ${received}</p>
-        <p class="expense">Expense: ${expense}</p>
-        <p class="balance">Balance: ${received-expense}</p></div>`;
-    });
-  }
-
-  function renderMonthly() {
-    const mon = {};
-    cashbook.forEach(e => {
-      const [day,mo,yr] = e.date.split(" ")[0].split("/");
-      const key = mo+"/"+yr;
-      mon[key] = mon[key] || { received: 0, expense: 0 };
-      mon[key].received += e.received;
-      mon[key].expense  += e.expense;
-    });
-    const mv = document.getElementById("monthlySummary");
-    mv.innerHTML = "<h3>Monthly Summary</h3>";
-    Object.entries(mon).forEach(([m, {received, expense}]) => {
-      mv.innerHTML += `<div class="card"><h3>${m}</h3>
-        <p class="received">Received: ${received}</p>
-        <p class="expense">Expense: ${expense}</p>
-        <p class="balance">Balance: ${received-expense}</p></div>`;
-    });
-  }
-
-  document.getElementById("dailyBtn").onclick = () => {
-    const b = document.getElementById("dailySummary");
-    b.style.display = b.style.display === "block" ? "none" : "block";
-  };
-  document.getElementById("monthlyBtn").onclick = () => {
-    const b = document.getElementById("monthlySummary");
-    b.style.display = b.style.display === "block" ? "none" : "block";
-  };
-
-  // Initialize
-  loadLocal();
-  loadFromCloud();  // 🔹 Cloud থেকে লোড
+window.onload = loadEntries;
 </script>
 </body>
 </html>
